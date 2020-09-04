@@ -1,7 +1,7 @@
 package com.example.loginlandingpage;
 
 import android.content.Context;
-import android.util.Log;
+import android.content.Intent;
 
 import androidx.room.Room;
 import androidx.test.core.app.ApplicationProvider;
@@ -16,25 +16,27 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.IOException;
-import java.util.List;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class AppDAOUnitTest {
     private AppDatabase db;
     private AppDAO userDAO;
+    private Context context;
 
     @Before
     public void createDB() {
-        Context context = ApplicationProvider.getApplicationContext();
+        context = ApplicationProvider.getApplicationContext();
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).build();
         userDAO = db.getAppDAO();
     }
 
     @After
-    public void closeDB() throws IOException {
+    public void closeDB() {
         db.close();
     }
 
@@ -66,37 +68,23 @@ public class AppDAOUnitTest {
 
     @Test
     public void verifyPasswordPassesTest() {
-        boolean pass = false;
-        UserLog testUser = new UserLog("din_djarin", "baby_yoda_ftw");
+        String enteredPassword = "baby_yoda_ftw";
         UserLog mUser = new UserLog("din_djarin", "baby_yoda_ftw");
         userDAO.insert(mUser);
-        List<UserLog> listOfAllUsers = userDAO.getAllUsers();
-        System.out.println("Size of list: " + listOfAllUsers.size());
-        for (UserLog user : listOfAllUsers) {
-            if (user.getUsername().equals(testUser.getUsername())) {
-                if (user.getPassword().equals(testUser.getPassword())) {
-                    pass = true;
-                }
-            }
-        }
-        assertTrue(pass);
+        assertEquals(mUser.getPassword(), enteredPassword);
     }
 
     @Test
     public void verifyPasswordFailsTest() {
-        boolean pass = false;
-        UserLog testUser = new UserLog("din_djarin", "beskar_4_ever");
+        String enteredPassword = "baeskar_4_ever";
         UserLog mUser = new UserLog("din_djarin", "baby_yoda_ftw");
         userDAO.insert(mUser);
-        List<UserLog> listOfAllUsers = userDAO.getAllUsers();
-        System.out.println("Size of list: " + listOfAllUsers.size());
-        for (UserLog user : listOfAllUsers) {
-            if (user.getUsername().equals(testUser.getUsername())) {
-                if (user.getPassword().equals(testUser.getPassword())) {
-                    pass = true;
-                }
-            }
-        }
-        assertFalse(pass);
+        assertNotEquals(mUser.getPassword(), enteredPassword);
+    }
+
+    @Test
+    public void verifyGoToLandingTest() {
+        Intent intent = Landing.intentFactory(context, 1);
+        assertNotNull(intent);
     }
 }
