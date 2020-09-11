@@ -37,7 +37,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         getDatabase();
-        if(mAppDao.getRowCount() <= 0){
+
+        //Check insertDefaultAcc() comment below for the functionality
+        if (mAppDao.getRowCount() <= 0) {
             insertDefaultAcc();
             Toast.makeText(this, "Default Account Made", Toast.LENGTH_SHORT).show();
         }
@@ -53,15 +55,17 @@ public class MainActivity extends AppCompatActivity {
                 String password = mPassword.getText().toString();
                 if (checkUser(name)) {
                     if (!validatePassword(password)) {
-                        Toast.makeText(MainActivity.this, "Wrong password", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Wrong password", Toast.LENGTH_SHORT)
+                                .show();
                         mPassword.setBackgroundColor(Color.RED);
                         mUsername.setBackgroundColor(Color.WHITE);
                     } else {
                         Intent intent = Landing.intentFactory(MainActivity.this, mUser.getUserId());
                         startActivity(intent);
                     }
-                }else{
-                    Toast.makeText(MainActivity.this, "No Account like that exists", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "No Account like that exists",
+                            Toast.LENGTH_SHORT).show();
                     mUsername.setBackgroundColor(Color.RED);
                     mPassword.setBackgroundColor(Color.WHITE);
                 }
@@ -70,9 +74,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getDatabase() {
-        mAppDao = Room.databaseBuilder(this, AppDatabase.class, AppDatabase.DB_NAME).allowMainThreadQueries().build().getAppDAO();
+        mAppDao = Room.databaseBuilder(this, AppDatabase.class, AppDatabase.DB_NAME)
+                .allowMainThreadQueries().build().getAppDAO();
     }
 
+    //On first creation of the app, the app generates a default account. Opening the app any
+    // other time will not allow this to run
     private void insertDefaultAcc() {
         UserLog daclink = new UserLog("din_djarin", "baby_yoda_ftw");
         mAppDao.insert(daclink);
@@ -83,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         return intent;
     }
 
+    //This checks if the user exists in the database
     public boolean checkUser(String name) {
         mUser = mAppDao.getUserByUsername(name);
         if (mUser == null) {
@@ -92,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    // After checking that the user exists and the mUser object is set, it checks if the password
+    // entered matches the password of the user
     public boolean validatePassword(String pw) {
         return mUser.getPassword().equals(pw);
     }
